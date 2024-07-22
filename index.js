@@ -101,7 +101,7 @@ app.post("/order", async (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.send("Welcome to Tourista!");
 });
 
 app.listen(port, () => {
