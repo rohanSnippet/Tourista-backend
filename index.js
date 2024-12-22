@@ -15,7 +15,7 @@ app.use(express.urlencoded({ extended: false }));
 //mongodb config
 mongoose
   .connect(
-    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@tourista.auwyist.mongodb.net/?retryWrites=true&w=majority&appName=tourista`
+    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@rohancluster.eb6cz.mongodb.net/?retryWrites=true&w=majority&appName=rohanCluster`
   )
   .then(console.log("MongoDB connected successfully"))
   .catch((error) => console.log("Error connecting to mongodb", error));
