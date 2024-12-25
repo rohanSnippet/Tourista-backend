@@ -14,9 +14,9 @@ const getCartsByEmail = async (req, res) => {
 //post a cart
 const addToCart = async (req, res) => {
   const { menuItemId, name, recipe, image, price, quantity, email } = req.body;
-  //console.log(req.body);
+  console.log(email);
   try {
-    const existingCartItem = await Carts.findOne({ menuItemId });
+    const existingCartItem = await Carts.findOne({ menuItemId, email });
     if (existingCartItem) {
       return res
         .status(400)
