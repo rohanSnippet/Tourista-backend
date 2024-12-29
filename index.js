@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
+
 require("dotenv").config();
 //middleware
 app.use(cors());
@@ -29,7 +30,7 @@ app.post("/jwt", async (req, res) => {
   res.send({ token });
 });
 
-//payment configure
+/************************ payment configure ***********************/
 
 //payment verification
 app.post("/order/validate", async (req, res) => {
