@@ -5,7 +5,6 @@ const userQuerySchema = new Schema({
   name: String,
   email: {
     type: String,
-    unique: true,
     minlength: 3,
     trim: true,
   },
