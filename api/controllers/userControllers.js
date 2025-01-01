@@ -1,4 +1,6 @@
 const User = require("../models/User");
+const Menu = require("../models/Menu");
+const { Decimal128 } = require("mongodb");
 
 const getAllUsers = async (req, res) => {
   try {
@@ -78,10 +80,90 @@ const makeAdmin = async (req, res) => {
   }
 };
 
+const giveRating = async (req, res) => {
+  try {
+    const { email } = req.params; // User email passed in the URL
+    const { tour_id, stars, feedback } = req.body; // Rating details from the request body
+
+    // Validate input
+    if (!tour_id || stars == null || !feedback) {
+      return res
+        .status(400)
+        .json({ message: "Tour ID, stars, and feedback are required." });
+    }
+
+    // Find the user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+    const existingRating = user.ratings.find(
+      (rating) => rating.tour_id.toString() === tour_id
+    );
+
+    if (existingRating) {
+      // Update the existing rating
+      existingRating.stars = stars;
+      existingRating.feedback = feedback;
+    } else {
+      // Add a new rating
+      user.ratings.push({ tour_id, stars, feedback });
+    }
+
+    // Add the rating to the user's ratings array
+
+    // Save the updated user
+    await user.save();
+
+    // Find the menu item by tour_id (assuming tour_id corresponds to menu item)
+    const menu = await Menu.findById(tour_id);
+    if (!menu) {
+      return res.status(404).json({ message: "Menu not found." });
+    }
+
+    // Convert Decimal128 to Number for stars and calculate the new average stars
+    const currentStars = menu.stars ? parseFloat(menu.stars.toString()) : 0; // Convert Decimal128 to Number
+    const totalStars = currentStars * (menu.reveiws || 0) + stars;
+    const totalReviews = !existingRating ? (menu.reveiws || 0) + 1 : "";
+    const averageStars = totalStars / totalReviews;
+
+    // Store the updated average stars as Decimal128
+    menu.stars = new Decimal128(averageStars.toString()); // Ensure Decimal128 precision is maintained
+    menu.reveiws = totalReviews;
+
+    // Save the updated menu
+    await menu.save();
+
+    res.status(200).json({ message: "Rating added successfully.", user, menu });
+  } catch (error) {
+    console.error("Error adding rating:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+const getRatings = async (req, res) => {
+  /*  try {
+    const { email, tour_id } = req.params;
+    if (!tour_id || !email) {
+      return res.status(400).json({ message: "Tour ID, stars are required." });
+    }
+
+    const ratings = await User.findOne({ email, tour_id });
+    if (!ratings) {
+      return res.status(404).json({ message: "Ratings not found." });
+    }
+
+    res.status(200).json({ ratings });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  } */
+};
 module.exports = {
   getAllUsers,
   createUser,
   deleteUser,
   getAdmin,
   makeAdmin,
+  giveRating,
+  getRatings,
 };

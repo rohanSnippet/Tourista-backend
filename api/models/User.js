@@ -15,6 +15,22 @@ const userSchema = new Schema({
     trim: ["user", "admin"],
     default: "user",
   },
+  ratings: [
+    {
+      tour_id: {
+        type: Schema.Types.ObjectId,
+      },
+      stars: {
+        type: mongoose.Schema.Types.Decimal128,
+        min: 0,
+        max: 5,
+      },
+      feedback: {
+        type: String,
+        trim: true,
+      },
+    },
+  ],
 });
 
 //model instance
