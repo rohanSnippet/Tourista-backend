@@ -142,22 +142,34 @@ const giveRating = async (req, res) => {
 };
 
 const getRatings = async (req, res) => {
-  /*  try {
+  try {
     const { email, tour_id } = req.params;
+
+    // Validate required parameters
     if (!tour_id || !email) {
-      return res.status(400).json({ message: "Tour ID, stars are required." });
+      return res
+        .status(400)
+        .json({ message: "Email and tour ID are required." });
     }
 
-    const ratings = await User.findOne({ email, tour_id });
-    if (!ratings) {
-      return res.status(404).json({ message: "Ratings not found." });
+    // Query the database
+    const user = await User.findOne(
+      { email, "ratings.tour_id": tour_id },
+      { "ratings.$": 1 } // Project only the matching rating
+    );
+
+    // Check if user or rating is found
+    if (!user || !user.ratings.length) {
+      return res.status(404).json({ message: "Rating not found." });
     }
 
-    res.status(200).json({ ratings });
+    // Return the matching rating
+    res.status(200).json({ rating: user.ratings[0] });
   } catch (error) {
     res.status(500).json({ message: error.message });
-  } */
+  }
 };
+
 module.exports = {
   getAllUsers,
   createUser,
