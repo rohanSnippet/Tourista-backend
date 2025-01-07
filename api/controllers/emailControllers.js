@@ -39,12 +39,13 @@ const createQuery = async (req, res) => {
 //getAllQueries for admin
 const getAllQueries = async (req, res) => {
   try {
-    const result = await UserQuery.find().exec();
+    const result = await UserQuery.find().sort({ date: -1 }).exec();
     res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 module.exports = {
   createQuery,
   getAllQueries,
