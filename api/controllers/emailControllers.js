@@ -16,7 +16,7 @@ const createQuery = async (req, res) => {
 
     const mailData = {
       from: result.email,
-      to: "rohan110620@gmail.com",
+      to: "tourista100@gmail.com", //og is "rohan110620@gmail.com"
       subject: question,
       text: feedback,
       html: `<h2>Dear Admin,</h2><br>
