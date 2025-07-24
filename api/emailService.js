@@ -7,8 +7,8 @@ const sendEmail = async (mailData) => {
       port: process.env.SMTP_PORT || 465,
       secure: true,
       auth: {
-        user: process.env.SMTP_MAIL || "rohan110620@gmail.com",
-        pass: process.env.SMTP_PASSWORD || "jiunuoqcuoesxyah",
+        user: process.env.SMTP_MAIL || "tourista100@gmail.com", //"rohan110620@gmail.com",
+        pass: process.env.SMTP_PASSWORD || "hxxwbowvodstxggq",//"jiunuoqcuoesxyah",
       },
     });
     await transporter.verify((error, success) => {
