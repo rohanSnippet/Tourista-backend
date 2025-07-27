@@ -10,6 +10,8 @@ router.post("/", bookingController.createBooking);
 // Route to update a booking by ID
 router.get("/", verifyToken, bookingController.getBookingByEmail);
 
+router.get("/isBooked", verifyToken, bookingController.isTourBookedByUser);
+
 // Route to get all bookings
 router.get("/all", verifyToken, verifyAdmin, bookingController.getAllBookings);
 

@@ -96,17 +96,45 @@ const createBooking = async (req, res) => {
 //get bookings by email
 const getBookingByEmail = async (req, res) => {
   const email = req.query.email;
-  //console.log(email);
+  console.log("query :", email);
   try {
     const decodedEmail = req.decoded.email;
     if (email !== decodedEmail) {
-      //console.log(decodedEmail);
+      console.log("decoded email : ", decodedEmail);
       return res.status(403).json({ message: "Forbidden access" });
     }
     const yourBookings = await Bookings.find({ email })
       .sort({ created_At: -1 })
       .exec();
+    console.log(yourBookings);
     res.status(200).json(yourBookings);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const isTourBookedByUser = async (req, res) => {
+  const { email, tour_id } = req.query; // Extract email and tour_id from query params
+  console.log(email, tour_id);
+  try {
+    // Ensure email matches the decoded token email
+    const decodedEmail = req.decoded.email;
+    if (email !== decodedEmail) {
+      return res.status(403).json({ message: "Forbidden access" });
+    }
+
+    // Check if a booking exists with the provided email and tour_id
+    const bookingExists = await Bookings.findOne({
+      email,
+      "tour_info._id": tour_id, // Match the tour_id inside the `tour_info` array
+    }).exec();
+
+    if (bookingExists) {
+      return res.status(200).json({ booked: true });
+    } else {
+      return res.status(200).json({ booked: false });
+    }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -147,4 +175,5 @@ module.exports = {
   getBookingByEmail,
   getAllBookings,
   deleteBookingById,
+  isTourBookedByUser,
 };

@@ -84,7 +84,7 @@ const giveRating = async (req, res) => {
   try {
     const { email } = req.params; // User email passed in the URL
     const { tour_id, stars, feedback } = req.body; // Rating details from the request body
-
+    // console.log(email, "   ", tour_id);
     // Validate input
     if (!tour_id || stars == null || !feedback) {
       return res
@@ -94,6 +94,7 @@ const giveRating = async (req, res) => {
 
     // Find the user by email
     const user = await User.findOne({ email });
+    //console.log("user is :", user);
     if (!user) {
       return res.status(404).json({ message: "User not found." });
     }
@@ -116,7 +117,9 @@ const giveRating = async (req, res) => {
     await user.save();
 
     // Find the menu item by tour_id (assuming tour_id corresponds to menu item)
+    console.log(typeof tour_id);
     const menu = await Menu.findById(tour_id);
+    console.log("menu is :", menu);
     if (!menu) {
       return res.status(404).json({ message: "Menu not found." });
     }
@@ -142,31 +145,63 @@ const giveRating = async (req, res) => {
 };
 
 const getRatings = async (req, res) => {
+  const { tour_id } = req.params;
   try {
-    const { email, tour_id } = req.params;
+    const users = await User.find();
+    // console.log(users);
+    const reviews = [];
+    users.forEach((user) => {
+      const userRatings = user.ratings.filter(
+        (rating) => rating.tour_id == tour_id
+      );
+      reviews.push(...userRatings);
+    });
+    //console.log(reviews);
+    const sortedReviews = reviews.sort((a, b) => b.stars - a.stars);
 
-    // Validate required parameters
-    if (!tour_id || !email) {
-      return res
-        .status(400)
-        .json({ message: "Email and tour ID are required." });
+    res.json(sortedReviews);
+  } catch (error) {
+    console.error("Error fetching tours:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const userRating = async (req, res) => {
+  const { email, tour_id } = req.params;
+
+  try {
+    // Fetch user by email
+    const user = await User.findOne({ email });
+
+    // If user not found
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
 
-    // Query the database
-    const user = await User.findOne(
-      { email, "ratings.tour_id": tour_id },
-      { "ratings.$": 1 } // Project only the matching rating
+    // Check if ratings exist
+    if (!user.ratings || !Array.isArray(user.ratings)) {
+      return res.status(404).json({ message: "No ratings found for the user" });
+    }
+
+    // Filter ratings for the specific tour_id
+    const review = user.ratings.find(
+      (rating) => rating.tour_id.toString() === tour_id
     );
 
-    // Check if user or rating is found
-    if (!user || !user.ratings.length) {
-      return res.status(404).json({ message: "Rating not found." });
+    // If no matching rating is found
+    if (!review) {
+      return res
+        .status(404)
+        .json({ message: "Rating not found for the specified tour" });
     }
 
-    // Return the matching rating
-    res.status(200).json({ rating: user.ratings[0] });
+    // Return the filtered review
+    res.json(review);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Error fetching user rating:", error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while fetching the rating" });
   }
 };
 
@@ -178,4 +213,5 @@ module.exports = {
   makeAdmin,
   giveRating,
   getRatings,
+  userRating,
 };

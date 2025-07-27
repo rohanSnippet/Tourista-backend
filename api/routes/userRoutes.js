@@ -10,5 +10,6 @@ router.delete("/:id", verifyToken, verifyAdmin, userControllers.deleteUser);
 router.patch("/admin/:id", verifyToken, userControllers.makeAdmin);
 router.get("/admin/:email", verifyToken, verifyAdmin, userControllers.getAdmin);
 router.put("/:email/ratings", verifyToken, userControllers.giveRating);
-router.get("/:email/:tour_id", verifyToken, userControllers.getRatings);
+router.get("/rating/:tour_id", verifyToken, userControllers.getRatings);
+router.get("/:email/:tour_id", verifyToken, userControllers.userRating);
 module.exports = router;
