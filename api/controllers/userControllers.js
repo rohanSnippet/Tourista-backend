@@ -156,7 +156,7 @@ const getRatings = async (req, res) => {
       );
       reviews.push(...userRatings);
     });
-    //console.log(reviews);
+    console.log(reviews);
     const sortedReviews = reviews.sort((a, b) => b.stars - a.stars);
 
     res.json(sortedReviews);
